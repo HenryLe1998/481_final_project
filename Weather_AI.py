@@ -3,9 +3,6 @@ import pyttsx3
 from datetime import date, datetime
 import wikipediaapi
 import requests
-import numpy as np
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Embedding, LSTM, Dense
 
 def search_wikipedia(query):
     wiki_wiki = wikipediaapi.Wikipedia(
@@ -37,15 +34,7 @@ def get_weather(api_key, city):
     else:
         print("Unable to get weather information.")
 
-def build_lstm_model(vocabulary_size, embedding_dim, input_length):
-    model = Sequential()
-    model.add(Embedding(input_dim=vocabulary_size, output_dim=embedding_dim, input_length=input_length))
-    model.add(LSTM(units=100))
-    model.add(Dense(units=1, activation='linear'))  # Assuming regression for weather temperature
-    model.compile(optimizer='adam', loss='mean_squared_error')
-    return model
-
-def respond_to_query(query, lstm_model):
+def respond_to_query(query):
     if "hello" in query:
         return "Hi! Let me know how I can help you today."
     elif "today" in query:
@@ -53,7 +42,9 @@ def respond_to_query(query, lstm_model):
         return today.strftime("%B %d, %Y.")
     elif "time" in query:
         now = datetime.now()
-        return now.strftime("%H hours %M minutes and %S seconds.")
+        if now.strftime("%H") < "13":
+            return now.strftime("%H am %M minutes and %S seconds.")
+        else: return now.strftime("%H pm %M and %S seconds.")
     elif "bye" in query:
         return "Goodbye! Let me know when you need help."
     elif "in Wikipedia" in query:
@@ -62,38 +53,13 @@ def respond_to_query(query, lstm_model):
         return result if result != "No information found on Wikipedia." else "Sorry, I haven't been programmed to answer this question."
     elif query.startswith("weather in"):
         city = query.split("weather in")[1].strip()
-        api_key = "YOUR_API_KEY"
+        api_key = "Use your API"
         get_weather(api_key, city)
         return None
     else:
-        # Use LSTM for generating a response based on the query
-        processed_query = preprocess_input_sequence(query)
-        predicted_response = lstm_model.predict(processed_query)
-        return f"My prediction: {predicted_response}"
-
-def preprocess_input_sequence(sequence):
-    # You may need to implement tokenization and padding based on your specific requirements
-    # For simplicity, let's convert the sequence to lowercase and split into words
-    tokens = sequence.lower().split()
-    # Assuming a fixed input length, pad or truncate the sequence as needed
-    processed_sequence = pad_or_truncate(tokens, max_sequence_length)
-    # Convert words to indices using a vocabulary
-    indices = [word_to_index[word] for word in processed_sequence]
-    return np.array(indices)
-
-def pad_or_truncate(sequence, length):
-    if len(sequence) < length:
-        return sequence + ['<PAD>'] * (length - len(sequence))
-    else:
-        return sequence[:length]
+        return "Sorry, I haven't been programmed to answer this question."
 
 def main():
-    # Set parameters for LSTM model
-    vocabulary_size = 10000  # Choose an appropriate vocabulary size based on your data
-    embedding_dim = 50
-    max_sequence_length = 20  # Choose an appropriate sequence length based on your data
-    lstm_model = build_lstm_model(vocabulary_size, embedding_dim, max_sequence_length)
-
     robot_ear = sr.Recognizer()
     robot_mouth = pyttsx3.init()
 
@@ -101,7 +67,7 @@ def main():
         with sr.Microphone() as mic:
             print("AI: I'm listening...")
             audio = robot_ear.listen(mic)
-
+        
         print("AI: ...")
         try:
             user_input = robot_ear.recognize_google(audio, language='en')
@@ -113,7 +79,7 @@ def main():
         if user_input == "":
             robot_brain = "I can't hear you, please try again!"
         else:
-            robot_brain = respond_to_query(user_input, lstm_model)
+            robot_brain = respond_to_query(user_input)
 
         if robot_brain is not None:
             print("AI: " + robot_brain)
