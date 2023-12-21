@@ -1,6 +1,6 @@
 # 481_final_project
 Group menber: Quoc Bao Le.
-Step 1: IDE install.
+\nStep 1: IDE install.
 -pip install SpeechRecognition.
 -pip install SpeechRecognition pyttsx3 wikipedia-api requests.
 -pip install pyaudio.
