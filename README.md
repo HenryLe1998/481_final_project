@@ -3,7 +3,9 @@ Step 1: IDE install
 -pip install SpeechRecognition
 -pip install SpeechRecognition pyttsx3 wikipedia-api requests
 -pip install pyaudio
+
 Step 2: replace the placeholder "YOUR_API_KEY" with your actual OpenWeatherMap API key.
+
 Step 3: run the Weather_AI.py
 
 Introduction:
