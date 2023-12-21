@@ -1,4 +1,5 @@
-# 481_final_project
+# 481_final_project.
+Quoc Bao Le.
 Step 1: IDE install.
 -pip install SpeechRecognition.
 -pip install SpeechRecognition pyttsx3 wikipedia-api requests.
